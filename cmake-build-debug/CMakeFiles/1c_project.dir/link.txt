@@ -1,0 +1,1 @@
+/usr/local/cellar/llvm/11.0.1/bin/clang++  -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/1c_project.dir/main.cpp.o  -o 1c_project 

@@ -1,0 +1,3 @@
+/Users/igormelnikov/Documents/programming/project_1c/1c_project/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/igormelnikov/Documents/programming/project_1c/1c_project/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/igormelnikov/Documents/programming/project_1c/1c_project/cmake-build-debug/CMakeFiles/1c_project.dir
