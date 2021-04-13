@@ -92,6 +92,10 @@ struct Program {
         }
     }
 
+    void Raw_add_course(Course* course) {
+        courses[course->level - 1].insert(course);
+    }
+
     int Get_courses_num(int level) {
         return courses[level - 1].size();
     }
@@ -144,6 +148,22 @@ public:
         }
     }
 
+    auto Branch(Course* new_course) {
+        Schedule clone = *this;
+
+        Program program;
+        program.Add_course(new_course);
+
+        for (auto& level: program.courses) {
+            for (auto course: level) {
+                if (!program_.Have_course(course)) {
+                    program_.Raw_add_course(course);
+                    Put(course);
+                }
+            }
+        }
+    }
+
 private:
     void Insert_course_(Course* node, int semester) {
         semesters[semester].insert(node);
@@ -166,8 +186,42 @@ private:
     static const int min_courses_ = 3;
 };
 
-void Make_schedule() {
-    std::vector<std::vector<Course*>> all_courses;
+
+std::vector<Course*> Prepare_courses(const std::string& json_file) {
+    std::vector<Course*> nodes;
+    std::vector<Course*> nums;
+    std::ifstream ifs(json_file);
+    std::stringstream buf; buf << ifs.rdbuf();
+
+    json jf = json::parse(buf.str());
+
+    for (auto& item: jf) {
+        nodes.push_back(Course::Make_course(item));
+        int n = nodes.back()->num;
+        if (nums.size() < n + 1) {
+            nums.resize(n + 1);
+        }
+        nums[n] = nodes.back();
+    }
+
+    for (auto& node: nodes) {
+        node->Set_requirements(nums);
+    }
+
+    return nodes;
+}
+
+auto Ordered_courses(const std::vector<Course*>& courses) {
+    std::vector<std::vector<Course*>> all_courses(5);
+    for (auto course: courses) {
+        all_courses[course->level - 1].push_back(course);
+    }
+
+    return all_courses;
+}
+
+auto Make_schedule(const std::vector<Course*>& raw_courses) {
+    std::vector<std::vector<Course*>> all_courses = Ordered_courses(raw_courses);
     std::queue<Program> raw_tracks;
     std::queue<Schedule> tracks;
 
@@ -205,30 +259,6 @@ void Make_schedule() {
             tracks.emplace(cur);
         }
     }
-}
-
-std::vector<Course*> Prepare_courses(const std::string& json_file) {
-    std::vector<Course*> nodes;
-    std::vector<Course*> nums;
-    std::ifstream ifs(json_file);
-    std::stringstream buf; buf << ifs.rdbuf();
-
-    json jf = json::parse(buf.str());
-
-    for (auto& item: jf) {
-        nodes.push_back(Course::Make_course(item));
-        int n = nodes.back()->num;
-        if (nums.size() < n + 1) {
-            nums.resize(n + 1);
-        }
-        nums[n] = nodes.back();
-    }
-
-    for (auto& node: nodes) {
-        node->Set_requirements(nums);
-    }
-
-    return nodes;
 }
 
 int main() {
